@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#f1f5f9;
+    color:#1e293b;
+}
+
+/* DARK MODE */
+.dark {
+    background:#0f172a;
+    color:white;
+}
+
+/* LAYOUT */
+.container {display:flex;}
+
+/* SIDEBAR */
+.sidebar {
+    width:220px;
+    height:100vh;
+    background:#334155;
+    color:white;
+    padding:20px;
+}
+
+.sidebar h2 {margin-bottom:30px;}
+
+.sidebar div {
+    margin:15px 0;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.sidebar div:hover {
+    background:#475569;
+}
+
+/* MAIN */
+.main {flex:1; padding:25px;}
+
+.top {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* CARDS */
+.cards {
+    display:flex;
+    gap:15px;
+    margin-top:15px;
+}
+
+.card {
+    flex:1;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* PROGRESS */
+.progress {
+    height:14px;
+    background:#e2e8f0;
+    margin:15px 0;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress div {
+    height:100%;
+    background:linear-gradient(90deg,#22c55e,#4ade80);
+    border-radius:10px;
+    transition:0.4s;
+    color:white;
+    text-align:center;
+    font-size:12px;
+}
+
+/* TASK */
+.task {
+    background:white;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    transition:0.3s;
+}
+
+.task:hover {
+    transform:scale(1.01);
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* PRIORITY */
+.low {border-left:6px solid #22c55e;}
+.medium {border-left:6px solid orange;}
+.high {border-left:6px solid red;}
+
+.expired {border:2px solid red;}
+.pinned {background:#fff7ed;}
+
+/* BUTTON */
+button {
+    padding:6px 10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    background:#3b82f6;
+    color:white;
+    transition:0.3s;
+}
+
+button:hover {opacity:0.85;}
+
+.actions button {margin-left:6px;}
+
+input, select {
+    padding:6px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    margin-right:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="sidebar">
+    <h2>Task App</h2>
+    <div onclick="filter='all';loadTasks()">📋 All</div>
+    <div onclick="filter='done';loadTasks()">✅ Completed</div>
+    <div onclick="filter='pending';loadTasks()">⏳ Pending</div>
+    <div onclick="clearCompleted()">🧹 Clear Done</div>
+</div>
+
+<div class="main">
+
+<div class="top">
+<h2>Dashboard</h2>
+
+<div>
+<input id="search" placeholder="Search..." onkeyup="loadTasks()">
+
+<select onchange="changeTheme(this.value)" id="theme">
+<option value="light">Light</option>
+<option value="dark">Dark</option>
+</select>
+</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress">
+<div id="bar">0%</div>
+</div>
+
+<div class="cards">
+<div class="card"><p>Total</p><h3 id="total"></h3></div>
+<div class="card"><p>Done</p><h3 id="done"></h3></div>
+<div class="card"><p>Pending</p><h3 id="pending"></h3></div>
+</div>
+
+<br>
+
+<!-- ADD TASK -->
+<input id="task" placeholder="Task">
+<input id="desc" placeholder="Description">
+<input type="date" id="date">
+
+<select id="priority">
+<option value="low">Low</option>
+<option value="medium">Medium</option>
+<option value="high">High</option>
+</select>
+
+<select id="category">
+<option value="work">Work</option>
+<option value="study">Study</option>
+<option value="personal">Personal</option>
+</select>
+
+<button onclick="addTask()">Add</button>
+
+<div id="list"></div>
+
+</div>
+</div>
+
+<script>
+
+let filter="all";
+
+/* THEME SAVE */
+function changeTheme(mode){
+localStorage.setItem("theme",mode);
+applyTheme();
+}
+
+function applyTheme(){
+let t=localStorage.getItem("theme");
+if(t==="dark"){
+document.body.classList.add("dark");
+document.getElementById("theme").value="dark";
+}
+}
+applyTheme();
+
+/* LOAD TASKS */
+async function loadTasks(){
+let res=await fetch("/tasks");
+let data=await res.json();
+
+let search=document.getElementById("search").value.toLowerCase();
+
+let list="";
+let done=0;
+
+let today=new Date();
+
+data.sort((a,b)=>(b.pinned||0)-(a.pinned||0));
+
+data.forEach(t=>{
+
+let isDone=(t.completed===true);
+if(isDone) done++;
+
+if(filter=="done" && !isDone) return;
+if(filter=="pending" && isDone) return;
+
+if(!(t.title.toLowerCase().includes(search) ||
+(t.category && t.category.includes(search)) ||
+(t.priority && t.priority.includes(search))))
+return;
+
+let id=t._id||t.id;
+
+let expired=false;
+if(t.date){
+let d=new Date(t.date);
+if(d<today && !isDone) expired=true;
+}
+
+list+=`
+<div class="task ${t.priority} ${expired?'expired':''} ${t.pinned?'pinned':''}">
+<div>
+<b>${t.title}</b> (${t.priority})<br>
+<small>${t.desc||""}</small><br>
+<small>${t.category||""}</small><br>
+<small>Due: ${t.date||"N/A"}</small>
+</div>
+
+<div class="actions">
+<button onclick="pin('${id}')">⭐</button>
+<button onclick="complete('${id}')">✔</button>
+<button onclick="del('${id}')">🗑</button>
+</div>
+</div>`;
+});
+
+document.getElementById("list").innerHTML=list;
+
+document.getElementById("total").innerText=data.length;
+document.getElementById("done").innerText=done;
+document.getElementById("pending").innerText=data.length-done;
+
+/* PROGRESS */
+let percent=data.length?(done/data.length)*100:0;
+document.getElementById("bar").style.width=percent+"%";
+document.getElementById("bar").innerText=Math.round(percent)+"%";
+}
+
+/* ADD */
+async function addTask(){
+await fetch("/add-task",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+title:task.value,
+desc:desc.value,
+priority:priority.value,
+category:category.value,
+date:date.value
+})
+});
+task.value="";
+desc.value="";
+loadTasks();
+}
+
+/* DELETE */
+async function del(id){
+await fetch("/delete-task/"+id,{method:"DELETE"});
+loadTasks();
+}
+
+/* COMPLETE */
+async function complete(id){
+await fetch("/complete-task/"+id,{method:"PUT"});
+loadTasks();
+}
+
+/* PIN */
+async function pin(id){
+await fetch("/pin-task/"+id,{method:"PUT"});
+loadTasks();
+}
+
+/* CLEAR DONE */
+async function clearCompleted(){
+await fetch("/clear-done",{method:"DELETE"});
+loadTasks();
+}
+
+loadTasks();
+
+</script>
+
+</body>
+</html>

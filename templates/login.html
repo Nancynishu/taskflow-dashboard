@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial;
+
+    background:linear-gradient(135deg,#1e293b,#0f172a);
+    color:white;
+}
+
+/* BOX */
+.box{
+    width:350px;
+    background:#334155;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* INPUT */
+input{
+    width:90%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:6px;
+    outline:none;
+}
+
+/* BUTTON */
+button{
+    width:95%;
+    padding:12px;
+    background:#3b82f6;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#2563eb;
+}
+
+/* LINK */
+.link{
+    margin-top:12px;
+    color:#22c55e;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2 id="title">Login</h2>
+
+<input id="email" placeholder="Enter Email">
+<input id="password" type="password" placeholder="Enter Password">
+
+<button onclick="submitForm()">Submit</button>
+
+<p onclick="toggle()" class="link">Switch to Register</p>
+
+</div>
+
+<script>
+
+let isLogin = true;
+
+/* TOGGLE LOGIN / REGISTER */
+function toggle(){
+    isLogin = !isLogin;
+
+    document.getElementById("title").innerText = isLogin ? "Login" : "Register";
+
+    document.querySelector(".link").innerText = isLogin 
+        ? "Switch to Register" 
+        : "Switch to Login";
+}
+
+/* SUBMIT */
+async function submitForm(){
+
+    let url = isLogin ? "/login" : "/register";
+
+    let res = await fetch(url,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            email:document.getElementById("email").value,
+            password:document.getElementById("password").value
+        })
+    });
+
+    let data = await res.json();
+
+    alert(data.message);
+
+    // LOGIN SUCCESS → DASHBOARD
+    if(isLogin && res.status === 200){
+        window.location.href = "/dashboard";
+    }
+
+    // REGISTER SUCCESS → AUTO SWITCH TO LOGIN
+    if(!isLogin && res.status === 200){
+        toggle();  // auto back to login
+    }
+}
+
+</script>
+
+</body>
+</html>
