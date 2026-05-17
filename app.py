@@ -1,192 +1,462 @@
-from flask import Flask, request, jsonify, render_template, redirect, session
+from flask import Flask, render_template, request, jsonify, redirect, session
 from pymongo import MongoClient
-from bson import ObjectId
+from bson.objectid import ObjectId
+from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "secret123"
+app.secret_key = "nancy_secret_key"
 
-# ---------------- MONGO ----------------
-client = MongoClient("mongodb://localhost:27017/")
-db = client["todo_db"]
 
-users_collection = db["users"]
-tasks_collection = db["tasks"]
+# ==========================
+# MONGODB CONNECTION
+# ==========================
 
-# ---------------- HOME ----------------
+try:
+
+    client = MongoClient(
+        "mongodb://localhost:27017/"
+    )
+
+    db = client["task_manager"]
+
+    users_collection = db["users"]
+    tasks_collection = db["tasks"]
+
+    print(
+        "MongoDB Connected Successfully"
+    )
+
+except Exception as e:
+
+    print(
+        "MongoDB Error:",
+        e
+    )
+
+
+# ==========================
+# HOME PAGE
+# ==========================
+
 @app.route("/")
 def home():
-    return redirect("/login-page")
 
-# ---------------- LOGIN PAGE ----------------
-@app.route("/login-page")
-def login_page():
-    return render_template("login.html")
+    return render_template(
+        "login.html"
+    )
 
-# ---------------- DASHBOARD ----------------
-@app.route("/dashboard")
-def dashboard():
-    if "user" not in session:
-        return redirect("/login-page")
-    return render_template("index.html")
 
-# ---------------- REGISTER ----------------
-@app.route("/register", methods=["POST"])
+# ==========================
+# REGISTER
+# ==========================
+
+@app.route(
+    "/register",
+    methods=["POST"]
+)
 def register():
-    data = request.json
 
-    if users_collection.find_one({"email": data.get("email")}):
-        return jsonify({"message": "User already exists"}), 400
+    try:
 
-    users_collection.insert_one({
-        "email": data.get("email"),
-        "password": data.get("password")
-    })
+        data = request.json
 
-    return jsonify({"message": "Registered successfully"})
+        first_name = data.get(
+            "firstName"
+        )
 
-# ---------------- LOGIN ----------------
-@app.route("/login", methods=["POST"])
-def login():
-    data = request.json
+        last_name = data.get(
+            "lastName"
+        )
 
-    user = users_collection.find_one({
-        "email": data.get("email"),
-        "password": data.get("password")
-    })
+        email = data.get(
+            "email"
+        )
 
-    if user:
-        session["user"] = data.get("email")
-        return jsonify({"message": "Login successful"})
-    else:
-        return jsonify({"message": "Invalid credentials"}), 401
+        password = data.get(
+            "password"
+        )
 
-# ---------------- LOGOUT ----------------
-@app.route("/logout")
-def logout():
-    session.pop("user", None)
-    return redirect("/login-page")
+        existing_user = (
+            users_collection.find_one(
+                {
+                    "email": email
+                }
+            )
+        )
 
-# ---------------- ADD TASK ----------------
-@app.route("/add-task", methods=["POST"])
-def add_task():
-    if "user" not in session:
-        return jsonify({"message": "Unauthorized"}), 401
+        if existing_user:
 
-    data = request.json
+            return jsonify({
+                "message":
+                "User already exists"
+            }), 400
 
-    task = {
-        "title": data.get("title"),
-        "desc": data.get("desc", ""),                 # NEW
-        "priority": data.get("priority", "low"),
-        "category": data.get("category", "work"),     # NEW
-        "date": data.get("date", ""),                 # NEW
-        "completed": False,
-        "pinned": False,                             # NEW
-        "user": session["user"]
-    }
+        users_collection.insert_one({
 
-    result = tasks_collection.insert_one(task)
+            "firstName":
+            first_name,
 
-    return jsonify({
-        "id": str(result.inserted_id),
-        "message": "Task added"
-    })
+            "lastName":
+            last_name,
 
-# ---------------- GET TASKS ----------------
-@app.route("/tasks", methods=["GET"])
-def get_tasks():
-    if "user" not in session:
-        return jsonify([])
+            "email":
+            email,
 
-    tasks = []
-
-    for t in tasks_collection.find({"user": session["user"]}):
-        tasks.append({
-            "id": str(t["_id"]),
-            "title": t.get("title", ""),
-            "desc": t.get("desc", ""),
-            "priority": t.get("priority", "low"),
-            "category": t.get("category", "work"),
-            "date": t.get("date", ""),
-            "completed": t.get("completed", False),
-            "pinned": t.get("pinned", False)
+            "password":
+            password
         })
 
-    return jsonify(tasks)
+        return jsonify({
+            "message":
+            "Registration Successful"
+        }), 200
 
-# ---------------- DELETE ----------------
-@app.route("/delete-task/<id>", methods=["DELETE"])
-def delete_task(id):
+    except Exception as e:
+
+        print(
+            "Register Error:",
+            e
+        )
+
+        return jsonify({
+            "message":
+            "Registration Failed"
+        }), 500
+
+
+# ==========================
+# LOGIN
+# ==========================
+
+@app.route(
+    "/login",
+    methods=["POST"]
+)
+def login():
+
     try:
-        tasks_collection.delete_one({"_id": ObjectId(id)})
-        return jsonify({"message": "Deleted"})
-    except:
-        return jsonify({"message": "Invalid ID"}), 400
 
-# ---------------- COMPLETE (TOGGLE) ----------------
-@app.route("/complete-task/<id>", methods=["PUT"])
+        data = request.json
+
+        first_name = data.get(
+            "firstName"
+        )
+
+        last_name = data.get(
+            "lastName"
+        )
+
+        email = data.get(
+            "email"
+        )
+
+        password = data.get(
+            "password"
+        )
+
+        user = (
+            users_collection.find_one(
+                {
+                    "firstName":
+                    first_name,
+
+                    "lastName":
+                    last_name,
+
+                    "email":
+                    email,
+
+                    "password":
+                    password
+                }
+            )
+        )
+
+        if user:
+
+            session[
+                "user_email"
+            ] = email
+
+            session[
+                "first_name"
+            ] = user.get(
+                "firstName",
+                "User"
+            )
+
+            session[
+                "last_name"
+            ] = user.get(
+                "lastName",
+                ""
+            )
+
+            return jsonify({
+
+                "message":
+                "Login Successful",
+
+                "firstName":
+                session[
+                    "first_name"
+                ],
+
+                "greeting":
+                "Welcome"
+
+            }), 200
+
+        return jsonify({
+
+            "message":
+            "Invalid Details"
+
+        }), 401
+
+    except Exception as e:
+
+        print(
+            "Login Error:",
+            e
+        )
+
+        return jsonify({
+
+            "message":
+            "Database Connection Failed"
+
+        }), 500
+
+
+# ==========================
+# DASHBOARD
+# ==========================
+
+@app.route("/dashboard")
+def dashboard():
+
+    if (
+        "user_email"
+        not in session
+    ):
+        return redirect("/")
+
+    hour = (
+        datetime.now().hour
+    )
+
+    if hour < 12:
+
+        greeting = (
+            "Good Morning ☀️"
+        )
+
+    elif hour < 17:
+
+        greeting = (
+            "Good Afternoon 🌤️"
+        )
+
+    else:
+
+        greeting = (
+            "Good Evening 🌙"
+        )
+
+    username = (
+        session.get(
+            "first_name",
+            "User"
+        )
+    )
+
+    return render_template(
+        "index.html",
+        username=username,
+        greeting=greeting
+    )
+
+
+# ==========================
+# GET TASKS
+# ==========================
+
+@app.route("/tasks")
+def get_tasks():
+
+    try:
+
+        tasks = []
+
+        for task in (
+            tasks_collection.find()
+        ):
+
+            task["_id"] = str(
+                task["_id"]
+            )
+
+            tasks.append(task)
+
+        return jsonify(tasks)
+
+    except Exception as e:
+
+        print(
+            "Task Fetch Error:",
+            e
+        )
+
+        return jsonify([])
+
+
+# ==========================
+# ADD TASK
+# ==========================
+
+@app.route(
+    "/add-task",
+    methods=["POST"]
+)
+def add_task():
+
+    try:
+
+        data = request.json
+
+        task = {
+
+            "title":
+            data.get(
+                "title"
+            ),
+
+            "desc":
+            data.get(
+                "desc"
+            ),
+
+            "priority":
+            data.get(
+                "priority"
+            ),
+
+            "category":
+            data.get(
+                "category"
+            ),
+
+            "date":
+            data.get(
+                "date"
+            ),
+
+            "completed":
+            False,
+
+            "pinned":
+            False
+        }
+
+        tasks_collection.insert_one(
+            task
+        )
+
+        return jsonify({
+
+            "message":
+            "Task Added"
+
+        })
+
+    except Exception as e:
+
+        print(
+            "Add Task Error:",
+            e
+        )
+
+        return jsonify({
+
+            "message":
+            "Task Add Failed"
+
+        }), 500
+
+
+# ==========================
+# COMPLETE TASK
+# ==========================
+
+@app.route(
+    "/complete-task/<id>",
+    methods=["PUT"]
+)
 def complete_task(id):
-    try:
-        task = tasks_collection.find_one({"_id": ObjectId(id)})
 
-        if not task:
-            return jsonify({"message": "Task not found"}), 404
-
-        tasks_collection.update_one(
-            {"_id": ObjectId(id)},
-            {"$set": {"completed": not task.get("completed", False)}}
-        )
-
-        return jsonify({"message": "Updated"})
-
-    except:
-        return jsonify({"message": "Invalid ID"}), 400
-
-# ---------------- PIN TASK ----------------
-@app.route("/pin-task/<id>", methods=["PUT"])
-def pin_task(id):
-    try:
-        task = tasks_collection.find_one({"_id": ObjectId(id)})
-
-        tasks_collection.update_one(
-            {"_id": ObjectId(id)},
-            {"$set": {"pinned": not task.get("pinned", False)}}
-        )
-
-        return jsonify({"message": "Pinned"})
-
-    except:
-        return jsonify({"message": "Error"}), 400
-
-# ---------------- CLEAR COMPLETED ----------------
-@app.route("/clear-done", methods=["DELETE"])
-def clear_done():
-    tasks_collection.delete_many({
-        "user": session["user"],
-        "completed": True
-    })
-    return jsonify({"message": "Cleared"})
-
-# ---------------- STATS ----------------
-@app.route("/stats", methods=["GET"])
-def stats():
-    if "user" not in session:
-        return jsonify({})
-
-    total = tasks_collection.count_documents({"user": session["user"]})
-    completed = tasks_collection.count_documents({
-        "user": session["user"],
-        "completed": True
-    })
-
-    pending = total - completed
+    tasks_collection.update_one(
+        {
+            "_id":
+            ObjectId(id)
+        },
+        {
+            "$set":
+            {
+                "completed":
+                True
+            }
+        }
+    )
 
     return jsonify({
-        "total": total,
-        "completed": completed,
-        "pending": pending
+
+        "message":
+        "Task Completed"
+
     })
 
-# ---------------- RUN ----------------
+
+# ==========================
+# DELETE TASK
+# ==========================
+
+@app.route(
+    "/delete-task/<id>",
+    methods=["DELETE"]
+)
+def delete_task(id):
+
+    tasks_collection.delete_one(
+        {
+            "_id":
+            ObjectId(id)
+        }
+    )
+
+    return jsonify({
+
+        "message":
+        "Task Deleted"
+
+    })
+
+
+# ==========================
+# LOGOUT
+# ==========================
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect("/")
+
+
+# ==========================
+# RUN APP
+# ==========================
+
 if __name__ == "__main__":
     app.run(debug=True)

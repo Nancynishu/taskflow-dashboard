@@ -1,328 +1,1496 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>Dashboard</title>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,
+initial-scale=1.0">
+
+<title>
+TaskFlow Dashboard
+</title>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
 
 <style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:#f1f5f9;
-    color:#1e293b;
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
 }
 
-/* DARK MODE */
-.dark {
-    background:#0f172a;
-    color:white;
+body{
+background:#f1f5f9;
+color:#1e293b;
+transition:0.4s;
 }
 
-/* LAYOUT */
-.container {display:flex;}
+body.dark{
+background:#0f172a;
+color:white;
+}
+
+.container{
+display:flex;
+min-height:100vh;
+}
 
 /* SIDEBAR */
-.sidebar {
-    width:220px;
-    height:100vh;
-    background:#334155;
-    color:white;
-    padding:20px;
+
+.sidebar{
+width:270px;
+background:
+linear-gradient(
+180deg,
+#0f172a,
+#1e293b
+);
+color:white;
+padding:25px;
+position:fixed;
+height:100%;
+overflow-y:auto;
+box-shadow:
+4px 0 20px
+rgba(0,0,0,0.1);
 }
 
-.sidebar h2 {margin-bottom:30px;}
-
-.sidebar div {
-    margin:15px 0;
-    padding:10px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.3s;
+.logo{
+font-size:32px;
+font-weight:700;
+margin-bottom:30px;
+text-align:center;
+color:#38bdf8;
 }
 
-.sidebar div:hover {
-    background:#475569;
+.menu-title{
+font-size:12px;
+opacity:0.7;
+margin:20px 0 10px;
+text-transform:uppercase;
+}
+
+.sidebar-item{
+padding:15px;
+border-radius:16px;
+margin-bottom:10px;
+cursor:pointer;
+transition:0.3s;
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:500;
+}
+
+.sidebar-item:hover{
+background:
+rgba(59,130,246,0.2);
+transform:
+translateX(5px);
+}
+
+.sidebar-item.active{
+background:
+linear-gradient(
+90deg,
+#2563eb,
+#3b82f6
+);
 }
 
 /* MAIN */
-.main {flex:1; padding:25px;}
 
-.top {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.main{
+margin-left:270px;
+flex:1;
+padding:30px;
+}
+
+/* NAVBAR */
+
+.navbar{
+background:white;
+padding:22px;
+border-radius:24px;
+display:flex;
+justify-content:
+space-between;
+align-items:center;
+box-shadow:
+0 6px 25px
+rgba(0,0,0,0.08);
+margin-bottom:25px;
+}
+
+.dark .navbar{
+background:#1e293b;
+}
+
+.greeting h2{
+font-size:30px;
+font-weight:700;
+}
+
+.greeting p{
+opacity:0.7;
+margin-top:5px;
+}
+
+.nav-right{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.icon-btn{
+width:50px;
+height:50px;
+border:none;
+border-radius:50%;
+cursor:pointer;
+font-size:20px;
+background:#eff6ff;
+transition:0.3s;
+}
+
+.icon-btn:hover{
+transform:scale(1.05);
+}
+
+.dark .icon-btn{
+background:#334155;
+color:white;
+}
+
+.profile{
+display:flex;
+align-items:center;
+gap:12px;
+background:#eff6ff;
+padding:10px 16px;
+border-radius:16px;
+cursor:pointer;
+}
+
+.dark .profile{
+background:#334155;
+}
+
+.avatar{
+width:45px;
+height:45px;
+border-radius:50%;
+background:#3b82f6;
+display:flex;
+justify-content:center;
+align-items:center;
+font-weight:bold;
+font-size:18px;
+color:white;
+}
+
+.section{
+display:none;
+}
+
+.section.active{
+display:block;
 }
 
 /* CARDS */
-.cards {
-    display:flex;
-    gap:15px;
-    margin-top:15px;
+
+.analytics{
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:25px;
 }
 
-.card {
-    flex:1;
-    background:white;
-    padding:15px;
-    border-radius:10px;
-    text-align:center;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+.card{
+background:white;
+padding:24px;
+border-radius:24px;
+box-shadow:
+0 6px 20px
+rgba(0,0,0,0.08);
+transition:0.3s;
 }
 
-/* PROGRESS */
-.progress {
-    height:14px;
-    background:#e2e8f0;
-    margin:15px 0;
-    border-radius:10px;
-    overflow:hidden;
+.card:hover{
+transform:
+translateY(-5px);
 }
 
-.progress div {
-    height:100%;
-    background:linear-gradient(90deg,#22c55e,#4ade80);
-    border-radius:10px;
-    transition:0.4s;
-    color:white;
-    text-align:center;
-    font-size:12px;
+.dark .card{
+background:#1e293b;
+}
+
+.card h2{
+font-size:32px;
+margin-top:10px;
+}
+
+.blue{
+border-left:5px solid #3b82f6;
+}
+
+.green{
+border-left:5px solid #22c55e;
+}
+
+.orange{
+border-left:5px solid orange;
+}
+
+.red{
+border-left:5px solid #ef4444;
+}
+
+.panel{
+background:white;
+padding:25px;
+border-radius:24px;
+box-shadow:
+0 6px 20px
+rgba(0,0,0,0.08);
+}
+
+.dark .panel{
+background:#1e293b;
+}
+
+/* FORM */
+
+input,
+select{
+padding:13px;
+border-radius:14px;
+border:1px solid #ddd;
+outline:none;
+margin:5px;
+}
+
+.dark input,
+.dark select{
+background:#334155;
+border:none;
+color:white;
+}
+
+button{
+border:none;
+cursor:pointer;
+border-radius:14px;
+transition:0.3s;
+}
+
+.add-btn{
+padding:12px 20px;
+background:
+linear-gradient(
+90deg,
+#2563eb,
+#3b82f6
+);
+color:white;
+font-weight:600;
+}
+
+.add-btn:hover{
+transform:scale(1.04);
 }
 
 /* TASK */
-.task {
-    background:white;
-    padding:12px;
-    margin:10px 0;
-    border-radius:10px;
-    display:flex;
-    justify-content:space-between;
-    transition:0.3s;
+
+.task{
+background:#f8fafc;
+padding:18px;
+border-radius:20px;
+margin-bottom:15px;
+display:flex;
+justify-content:
+space-between;
+align-items:center;
 }
 
-.task:hover {
-    transform:scale(1.01);
-    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+.dark .task{
+background:#334155;
 }
 
-/* PRIORITY */
-.low {border-left:6px solid #22c55e;}
-.medium {border-left:6px solid orange;}
-.high {border-left:6px solid red;}
-
-.expired {border:2px solid red;}
-.pinned {background:#fff7ed;}
-
-/* BUTTON */
-button {
-    padding:6px 10px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    background:#3b82f6;
-    color:white;
-    transition:0.3s;
+.low{
+border-left:
+6px solid #38bdf8;
 }
 
-button:hover {opacity:0.85;}
-
-.actions button {margin-left:6px;}
-
-input, select {
-    padding:6px;
-    border-radius:6px;
-    border:1px solid #ccc;
-    margin-right:5px;
+.medium{
+border-left:
+6px solid #8b5cf6;
 }
+
+.high{
+border-left:
+6px solid #ef4444;
+}
+
+.actions button{
+padding:8px 12px;
+margin-left:6px;
+color:white;
+}
+
+.complete{
+background:#22c55e;
+}
+
+.delete{
+background:#ef4444;
+}
+
+.badge{
+padding:5px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+background:#e2e8f0;
+}
+
+.profile-card{
+text-align:center;
+padding:30px;
+}
+
+.profile-avatar{
+width:110px;
+height:110px;
+border-radius:50%;
+background:#2563eb;
+margin:auto;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:42px;
+color:white;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+.setting-item{
+padding:15px;
+background:#eff6ff;
+border-radius:14px;
+margin-bottom:12px;
+cursor:pointer;
+}
+
+.dark .setting-item{
+background:#334155;
+}
+
+#toast{
+position:fixed;
+top:20px;
+right:20px;
+background:#22c55e;
+color:white;
+padding:15px 20px;
+border-radius:12px;
+display:none;
+z-index:999;
+}
+
 </style>
+
 </head>
 
 <body>
 
+<div id="toast"></div>
+
 <div class="container">
 
+<!-- SIDEBAR -->
+
 <div class="sidebar">
-    <h2>Task App</h2>
-    <div onclick="filter='all';loadTasks()">📋 All</div>
-    <div onclick="filter='done';loadTasks()">✅ Completed</div>
-    <div onclick="filter='pending';loadTasks()">⏳ Pending</div>
-    <div onclick="clearCompleted()">🧹 Clear Done</div>
+
+<div class="logo">
+TaskFlow
+</div>
+
+<div class="menu-title">
+Menu
+</div>
+
+<div
+class="sidebar-item active"
+onclick="showSection('dashboard',this)">
+📊 Dashboard
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('tasks',this)">
+📋 All Tasks
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('pending',this)">
+⏳ Pending
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('completed',this)">
+✅ Completed
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('important',this)">
+⭐ Important
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('calendar',this)">
+📅 Calendar
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('analytics',this)">
+📈 Analytics
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('profileSection',this)">
+👤 Profile
+</div>
+
+<div
+class="sidebar-item"
+onclick="showSection('settings',this)">
+⚙ Settings
+</div>
+
 </div>
 
 <div class="main">
 
-<div class="top">
-<h2>Dashboard</h2>
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+<div class="greeting">
+<h2 id="greetingText">
+{{ greeting }},
+{{ username }} 👋
+</h2>
+
+<p>
+Stay productive and manage
+your work smarter.
+</p>
+
+</div>
+
+<div class="nav-right">
+
+<button
+class="icon-btn"
+onclick="toggleTheme()">
+🌙
+</button>
+
+<button
+class="icon-btn"
+onclick="showNotifications()">
+🔔
+</button>
+
+<div
+class="profile"
+onclick="showSection('profileSection')">
+
+<div class="avatar">
+{{ username[0] }}
+</div>
 
 <div>
-<input id="search" placeholder="Search..." onkeyup="loadTasks()">
 
-<select onchange="changeTheme(this.value)" id="theme">
-<option value="light">Light</option>
-<option value="dark">Dark</option>
-</select>
-</div>
-</div>
+<h4>
+{{ username }}
+</h4>
 
-<!-- PROGRESS -->
-<div class="progress">
-<div id="bar">0%</div>
+<small>
+Task Manager
+</small>
+
 </div>
 
-<div class="cards">
-<div class="card"><p>Total</p><h3 id="total"></h3></div>
-<div class="card"><p>Done</p><h3 id="done"></h3></div>
-<div class="card"><p>Pending</p><h3 id="pending"></h3></div>
 </div>
+
+</div>
+
+</div>
+
+<div
+id="notificationBox"
+class="panel"
+style="display:none;
+margin-bottom:20px;">
+
+<h3>
+🔔 Notifications
+</h3>
 
 <br>
 
-<!-- ADD TASK -->
-<input id="task" placeholder="Task">
-<input id="desc" placeholder="Description">
-<input type="date" id="date">
+<p>
+✅ Complete pending tasks
+to improve productivity.
+</p>
+
+<p>
+⭐ Important tasks are
+high priority tasks.
+</p>
+
+</div>
+<!-- DASHBOARD -->
+
+<div
+id="dashboard"
+class="section active">
+
+<div class="analytics">
+
+<div class="card blue">
+<small>
+Total Tasks
+</small>
+<h2 id="total">
+0
+</h2>
+</div>
+
+<div class="card green">
+<small>
+Completed
+</small>
+<h2 id="done">
+0
+</h2>
+</div>
+
+<div class="card orange">
+<small>
+Pending
+</small>
+<h2 id="pendingCount">
+0
+</h2>
+</div>
+
+<div class="card red">
+<small>
+Important
+</small>
+<h2 id="importantCount">
+0
+</h2>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2 style="margin-bottom:15px;">
+Today's Productivity
+</h2>
+
+<p style="opacity:0.8;">
+Welcome back
+<b>{{ username }}</b> 👋
+
+You are doing great.
+Complete your pending tasks
+to stay organized and
+increase productivity.
+</p>
+
+<br>
+
+<div class="analytics">
+
+<div class="card blue">
+<small>
+Today's Goal
+</small>
+
+<h2>
+🎯 Focus
+</h2>
+
+</div>
+
+<div class="card green">
+<small>
+Completed Rate
+</small>
+
+<h2 id="productivity">
+0%
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ALL TASKS -->
+
+<div
+id="tasks"
+class="section">
+
+<div class="panel">
+
+<h2>
+📋 Task Manager
+</h2>
+
+<br>
+
+<input
+id="task"
+placeholder="Task title">
+
+<input
+id="desc"
+placeholder="Description">
+
+<input
+type="date"
+id="date">
 
 <select id="priority">
-<option value="low">Low</option>
-<option value="medium">Medium</option>
-<option value="high">High</option>
+
+<option value="low">
+Low
+</option>
+
+<option value="medium">
+Medium
+</option>
+
+<option value="high">
+High
+</option>
+
 </select>
 
 <select id="category">
-<option value="work">Work</option>
-<option value="study">Study</option>
-<option value="personal">Personal</option>
+
+<option value="work">
+Work
+</option>
+
+<option value="study">
+Study
+</option>
+
+<option value="personal">
+Personal
+</option>
+
 </select>
 
-<button onclick="addTask()">Add</button>
+<button
+class="add-btn"
+onclick="addTask()">
+
++ Add Task
+
+</button>
+
+<br><br>
+
+<input
+id="search"
+placeholder="Search Tasks..."
+onkeyup="loadTasks()">
+
+<br><br>
 
 <div id="list"></div>
 
 </div>
+
 </div>
 
+<!-- PENDING -->
+
+<div
+id="pending"
+class="section">
+
+<div class="panel">
+
+<h2>
+⏳ Pending Tasks
+</h2>
+
+<br>
+
+<div id="pendingList">
+</div>
+
+</div>
+
+</div>
+
+<!-- COMPLETED -->
+
+<div
+id="completed"
+class="section">
+
+<div class="panel">
+
+<h2>
+✅ Completed Tasks
+</h2>
+
+<br>
+
+<div id="completedList">
+</div>
+
+</div>
+
+</div>
+
+<!-- IMPORTANT -->
+
+<div
+id="important"
+class="section">
+
+<div class="panel">
+
+<h2>
+⭐ Important Tasks
+</h2>
+
+<p style="opacity:0.7;">
+High priority tasks appear here automatically
+</p>
+
+<br>
+
+<div id="importantList">
+</div>
+
+</div>
+
+</div>
+
+<!-- CALENDAR -->
+
+<div
+id="calendar"
+class="section">
+
+<div class="panel">
+
+<h2>
+📅 Task Calendar
+</h2>
+
+<br>
+
+<div id="calendarList">
+</div>
+
+</div>
+
+</div>
+
+<!-- ANALYTICS -->
+
+<div
+id="analytics"
+class="section">
+
+<div class="panel">
+
+<h2>
+📈 Analytics
+</h2>
+
+<br>
+
+<div class="analytics">
+
+<div class="card blue">
+
+<small>
+Productivity
+</small>
+
+<h2 id="analyticsProductivity">
+0%
+</h2>
+
+</div>
+
+<div class="card green">
+
+<small>
+Completed
+</small>
+
+<h2 id="analyticsDone">
+0
+</h2>
+
+</div>
+
+<div class="card orange">
+
+<small>
+Pending
+</small>
+
+<h2 id="analyticsPending">
+0
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- PROFILE -->
+
+<div
+id="profileSection"
+class="section">
+
+<div class="panel profile-card">
+
+<div class="profile-avatar">
+{{ username[0] }}
+</div>
+
+<h2>
+{{ username }}
+</h2>
+
+<p style="opacity:0.7;">
+TaskFlow User
+</p>
+
+<br>
+
+<div class="analytics">
+
+<div class="card blue">
+
+<small>
+Total Tasks
+</small>
+
+<h2 id="profileTotal">
+0
+</h2>
+
+</div>
+
+<div class="card green">
+
+<small>
+Completed
+</small>
+
+<h2 id="profileDone">
+0
+</h2>
+
+</div>
+
+<div class="card orange">
+
+<small>
+Pending
+</small>
+
+<h2 id="profilePending">
+0
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- SETTINGS -->
+
+<div
+id="settings"
+class="section">
+
+<div class="panel">
+
+<h2>
+⚙ Settings
+</h2>
+
+<br>
+
+<div
+class="setting-item"
+onclick="toggleTheme()">
+
+🌙 Toggle Theme
+
+</div>
+
+<div
+class="setting-item"
+onclick="showToast('Notifications Enabled 🔔')">
+
+🔔 Notifications
+
+</div>
+
+<div
+class="setting-item"
+onclick="logout()">
+
+🚪 Logout
+
+</div>
+
+</div>
+
+</div>
 <script>
 
-let filter="all";
+let allTasks = [];
 
-/* THEME SAVE */
-function changeTheme(mode){
-localStorage.setItem("theme",mode);
-applyTheme();
+/* TOAST */
+
+function showToast(
+msg,
+color="#22c55e"
+){
+
+let toast =
+document.getElementById(
+"toast"
+);
+
+toast.innerText =
+msg;
+
+toast.style.background =
+color;
+
+toast.style.display =
+"block";
+
+setTimeout(()=>{
+
+toast.style.display =
+"none";
+
+},2000);
+
 }
 
-function applyTheme(){
-let t=localStorage.getItem("theme");
-if(t==="dark"){
-document.body.classList.add("dark");
-document.getElementById("theme").value="dark";
+
+/* SIDEBAR */
+
+function showSection(
+id,
+element=null
+){
+
+document
+.querySelectorAll(
+".section"
+)
+.forEach(section=>{
+
+section.classList.remove(
+"active"
+);
+
+});
+
+document
+.getElementById(id)
+.classList.add(
+"active"
+);
+
+document
+.querySelectorAll(
+".sidebar-item"
+)
+.forEach(item=>{
+
+item.classList.remove(
+"active"
+);
+
+});
+
+if(element){
+
+element.classList.add(
+"active"
+);
+
 }
+
 }
-applyTheme();
+
+
+/* DARK MODE */
+
+function toggleTheme(){
+
+document.body.classList.toggle(
+"dark"
+);
+
+showToast(
+"Theme Changed 🌙"
+);
+
+}
+
+
+/* NOTIFICATIONS */
+
+function showNotifications(){
+
+let box =
+document.getElementById(
+"notificationBox"
+);
+
+box.style.display =
+box.style.display ===
+"none"
+? "block"
+: "none";
+
+}
+
 
 /* LOAD TASKS */
+
 async function loadTasks(){
-let res=await fetch("/tasks");
-let data=await res.json();
 
-let search=document.getElementById("search").value.toLowerCase();
+let res =
+await fetch(
+"/tasks"
+);
 
-let list="";
-let done=0;
+allTasks =
+await res.json();
 
-let today=new Date();
+renderTasks();
 
-data.sort((a,b)=>(b.pinned||0)-(a.pinned||0));
-
-data.forEach(t=>{
-
-let isDone=(t.completed===true);
-if(isDone) done++;
-
-if(filter=="done" && !isDone) return;
-if(filter=="pending" && isDone) return;
-
-if(!(t.title.toLowerCase().includes(search) ||
-(t.category && t.category.includes(search)) ||
-(t.priority && t.priority.includes(search))))
-return;
-
-let id=t._id||t.id;
-
-let expired=false;
-if(t.date){
-let d=new Date(t.date);
-if(d<today && !isDone) expired=true;
 }
 
-list+=`
-<div class="task ${t.priority} ${expired?'expired':''} ${t.pinned?'pinned':''}">
+
+/* RENDER TASKS */
+
+function renderTasks(){
+
+let list =
+document.getElementById(
+"list"
+);
+
+let pendingList =
+document.getElementById(
+"pendingList"
+);
+
+let completedList =
+document.getElementById(
+"completedList"
+);
+
+let importantList =
+document.getElementById(
+"importantList"
+);
+
+let calendarList =
+document.getElementById(
+"calendarList"
+);
+
+list.innerHTML = "";
+pendingList.innerHTML = "";
+completedList.innerHTML = "";
+importantList.innerHTML = "";
+calendarList.innerHTML = "";
+
+let search =
+document.getElementById(
+"search"
+)?.value
+.toLowerCase()
+|| "";
+
+let completed = 0;
+let pending = 0;
+let important = 0;
+
+allTasks.forEach(task=>{
+
+if(
+!task.title
+.toLowerCase()
+.includes(search)
+){
+return;
+}
+
+let taskHTML =
+`
+<div class="task ${task.priority}">
+
 <div>
-<b>${t.title}</b> (${t.priority})<br>
-<small>${t.desc||""}</small><br>
-<small>${t.category||""}</small><br>
-<small>Due: ${t.date||"N/A"}</small>
+
+<h3>
+${task.title}
+</h3>
+
+<p>
+${task.desc || ""}
+</p>
+
+<br>
+
+<span class="badge">
+${task.priority}
+</span>
+
+${
+task.date
+?
+`<small>
+📅 ${task.date}
+</small>`
+:
+""
+}
+
 </div>
 
 <div class="actions">
-<button onclick="pin('${id}')">⭐</button>
-<button onclick="complete('${id}')">✔</button>
-<button onclick="del('${id}')">🗑</button>
+
+${
+!task.completed
+?
+`<button
+class="complete"
+onclick="completeTask('${task._id}')">
+✓
+</button>`
+:
+""
+}
+
+<button
+class="delete"
+onclick="deleteTask('${task._id}')">
+
+🗑
+
+</button>
+
 </div>
-</div>`;
-});
 
-document.getElementById("list").innerHTML=list;
+</div>
+`;
 
-document.getElementById("total").innerText=data.length;
-document.getElementById("done").innerText=done;
-document.getElementById("pending").innerText=data.length-done;
+list.innerHTML +=
+taskHTML;
 
-/* PROGRESS */
-let percent=data.length?(done/data.length)*100:0;
-document.getElementById("bar").style.width=percent+"%";
-document.getElementById("bar").innerText=Math.round(percent)+"%";
+calendarList.innerHTML +=
+taskHTML;
+
+if(task.completed){
+
+completed++;
+
+completedList.innerHTML +=
+taskHTML;
+
+}else{
+
+pending++;
+
+pendingList.innerHTML +=
+taskHTML;
+
 }
 
-/* ADD */
+if(
+task.priority ===
+"high"
+){
+
+important++;
+
+importantList.innerHTML +=
+taskHTML;
+
+}
+
+});
+
+
+/* DASHBOARD COUNTS */
+
+document.getElementById(
+"total"
+).innerText =
+allTasks.length;
+
+document.getElementById(
+"done"
+).innerText =
+completed;
+
+document.getElementById(
+"pendingCount"
+).innerText =
+pending;
+
+document.getElementById(
+"importantCount"
+).innerText =
+important;
+
+
+/* ANALYTICS */
+
+let productivity =
+allTasks.length
+?
+Math.round(
+(completed /
+allTasks.length)
+* 100
+)
+: 0;
+
+document.getElementById(
+"productivity"
+).innerText =
+productivity + "%";
+
+document.getElementById(
+"analyticsProductivity"
+).innerText =
+productivity + "%";
+
+document.getElementById(
+"analyticsDone"
+).innerText =
+completed;
+
+document.getElementById(
+"analyticsPending"
+).innerText =
+pending;
+
+
+/* PROFILE */
+
+document.getElementById(
+"profileTotal"
+).innerText =
+allTasks.length;
+
+document.getElementById(
+"profileDone"
+).innerText =
+completed;
+
+document.getElementById(
+"profilePending"
+).innerText =
+pending;
+
+}
+
+
+/* ADD TASK */
+
 async function addTask(){
-await fetch("/add-task",{
+
+let title =
+document.getElementById(
+"task"
+).value;
+
+let desc =
+document.getElementById(
+"desc"
+).value;
+
+let priority =
+document.getElementById(
+"priority"
+).value;
+
+let category =
+document.getElementById(
+"category"
+).value;
+
+let date =
+document.getElementById(
+"date"
+).value;
+
+if(!title){
+
+showToast(
+"Enter task title",
+"#ef4444"
+);
+
+return;
+}
+
+await fetch(
+"/add-task",
+{
 method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-title:task.value,
-desc:desc.value,
-priority:priority.value,
-category:category.value,
-date:date.value
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify({
+
+title,
+desc,
+priority,
+category,
+date
+
 })
-});
-task.value="";
-desc.value="";
+}
+);
+
+showToast(
+"Task Added ✅"
+);
+
+document.getElementById(
+"task"
+).value = "";
+
+document.getElementById(
+"desc"
+).value = "";
+
+document.getElementById(
+"date"
+).value = "";
+
 loadTasks();
+
 }
 
-/* DELETE */
-async function del(id){
-await fetch("/delete-task/"+id,{method:"DELETE"});
+
+/* COMPLETE TASK */
+
+async function completeTask(id){
+
+await fetch(
+`/complete-task/${id}`,
+{
+method:"PUT"
+}
+);
+
+showToast(
+"Task Completed 🎉"
+);
+
 loadTasks();
+
 }
 
-/* COMPLETE */
-async function complete(id){
-await fetch("/complete-task/"+id,{method:"PUT"});
+
+/* DELETE TASK */
+
+async function deleteTask(id){
+
+await fetch(
+`/delete-task/${id}`,
+{
+method:"DELETE"
+}
+);
+
+showToast(
+"Task Deleted 🗑",
+"#ef4444"
+);
+
 loadTasks();
+
 }
 
-/* PIN */
-async function pin(id){
-await fetch("/pin-task/"+id,{method:"PUT"});
-loadTasks();
+
+/* LOGOUT */
+
+function logout(){
+
+window.location.href =
+"/logout";
+
 }
 
-/* CLEAR DONE */
-async function clearCompleted(){
-await fetch("/clear-done",{method:"DELETE"});
-loadTasks();
-}
+
+/* INITIAL LOAD */
 
 loadTasks();
 
